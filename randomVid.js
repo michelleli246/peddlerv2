@@ -1,4 +1,4 @@
-var vid0 = { vname: "Gondola in Venice", image: "testpics/gondola.jpg", link: "vidpages/v0.html", vid: "vids/gondola.mp4"};
+var vid0 = { vname: "Gondola in Venice", image: "testpics/gondola.jpg", link: "vidpages/v0.html", vid: "vids/gondola.mp4" };
 var vid1 = { vname: "French Alps", image: "testpics/frenchalps.jpg", link: "vidpages/v1.html", vid: "vids/alps.mp4" };
 var vid2 = { vname: "Central Park", image: "testpics/centralpark.jpg", link: "vidpages/v2.html", vid: "vids/centralpark.mp4" };
 var vid3 = { vname: "Rocky Desert", image: "testpics/rockydesert.jpg", link: "vidpages/v3.html", vid: "vids/OrmaraMountain.mp4" };
@@ -40,7 +40,7 @@ function getTrackForNextPage() {
         trackIndexOfCurrentPage = [];
         trackOfCurrentPage = [];
 
-        for (var r = 0; r < numberTracksPerPage; r++) { 
+        for (var r = 0; r < numberTracksPerPage; r++) {
             trackIndexOfCurrentPage[r] = r;
             trackOfCurrentPage[r] = arrTracks[trackIndexOfCurrentPage[r]];
         }
@@ -57,7 +57,7 @@ function getTrackForNextPage() {
             trackOfCurrentPage[r] = arrTracks[trackIndexOfCurrentPage[r]];
         }
     }
- 
+
     document.getElementById("but0").innerHTML = trackOfCurrentPage[0].vname;
     document.getElementById("but1").innerHTML = trackOfCurrentPage[1].vname;
     document.getElementById("but2").innerHTML = trackOfCurrentPage[2].vname;
@@ -75,11 +75,11 @@ function getTrackForNextPage() {
     document.getElementById("but4").style.background = "url('" + trackOfCurrentPage[4].image + "')";
     document.getElementById("but4").style.backgroundSize = "215px 215px";
 
-    document.getElementById("but0").onclick = function () { localStorage.setItem("vidlocation", trackOfCurrentPage[0].vid); location.href = "vidpages/onepageallvids.html";};
-    document.getElementById("but1").onclick = function () { localStorage.setItem("vidlocation", trackOfCurrentPage[1].vid); location.href = "vidpages/onepageallvids.html";};
-    document.getElementById("but2").onclick = function () { localStorage.setItem("vidlocation", trackOfCurrentPage[2].vid); location.href = "vidpages/onepageallvids.html"; };
-    document.getElementById("but3").onclick = function () { localStorage.setItem("vidlocation", trackOfCurrentPage[3].vid); location.href = "vidpages/onepageallvids.html"; };
-    document.getElementById("but4").onclick = function () { localStorage.setItem("vidlocation", trackOfCurrentPage[4].vid); location.href = "vidpages/onepageallvids.html"; };
+    document.getElementById("but0").onclick = function () { var vid2 = trackOfCurrentPage[0].vid; location.assign(`vidpages/onepageallvids.html#${vid2}`); };
+    document.getElementById("but1").onclick = function () { var vid2 = trackOfCurrentPage[1].vid; location.assign(`vidpages/onepageallvids.html#${vid2}`); };
+    document.getElementById("but2").onclick = function () { var vid2 = trackOfCurrentPage[2].vid; location.assign(`vidpages/onepageallvids.html#${vid2}`); };
+    document.getElementById("but3").onclick = function () { var vid2 = trackOfCurrentPage[3].vid; location.assign(`vidpages/onepageallvids.html#${vid2}`); };
+    document.getElementById("but4").onclick = function () { var vid2 = trackOfCurrentPage[4].vid; location.assign(`vidpages/onepageallvids.html#${vid2}`); };
 
 }
 
