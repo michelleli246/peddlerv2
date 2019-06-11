@@ -1,0 +1,50 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Peddler</title>
+    <link rel="stylesheet" type="text/css" href="../pauseScreen.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="../peddler.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
+    <script src="../loadvideo.js" type="text/javascript"></script>
+    <script src="../speedchanger.js" type="text/javascript"></script>
+    <script src="../keypress.js" type="text/javascript"></script>
+    <script src="../randomAudio.js" type="text/javascript"></script>
+
+</head>
+
+<body onload="togglePause();">
+    <div id="any" onclick="togglePause(); audioPause();">
+        <!-- <div id="back"> <a href="/">Back to Videos</a></div> -->
+        <video width="420" height="315" id="bikeVideo" muted="muted"></video>
+        <p class="pauseInstructions">Tap or press any button to pause</p>
+    </div>
+
+    <div id="pauseScreen" class="all">
+
+        <div class="blueBg">
+            <div>
+                <p class="title">Paused <p>
+            </div>
+
+            <div class="buttons">
+                <button id="but0" class="playButton" type="button" onclick="location.href = '../onePlayerSel.html'">Back to Menu</button>
+                <button id="but1" class="playButton" type="button" onclick="togglePause(); audioPlay();">Resume</button>
+                <button id="but2" class="playButton" type="button" onclick="window.location.reload();">Restart</button>
+                <br>
+                <button class="disabled" type="button" onclick=""></button>
+                <button class="disabled" type="button" onclick=""></button>
+                <button class="disabled" type="button" onclick=""></button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

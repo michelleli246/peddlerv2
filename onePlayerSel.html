@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Path Selection</title>
+    <link rel="stylesheet" type="text/css" href="pickvid.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="randomVid.js" type="text/javascript"></script>
+    <script src="keypress.js" type="text/javascript"></script>
+
+
+</head>
+
+<body>
+    <div class="all">
+        <img class="logo" src="img/logolong.jpg" width="200" alt="Logo">
+        <br>
+        <div class="blueBg">
+            <br>
+            <div>
+                <p class="title">Where would you like to explore? <p>
+            </div>
+
+            <div class="buttons">
+                <button id="but0" class="pickButton" type="button"></button>
+                <button id="but1" class="pickButton" type="button"></button>
+                <button id="but2" class="pickButton" type="button"></button>
+            </div>
+            <br>
+            <div class="buttons">
+                <button id="but3" class="pickButton" type="button"></button>
+                <button id="but4" class="pickButton" type="button"></button>
+                <button id="but5" class="playButton" type="button" onclick="getTrackForNextPage()">Shuffle</button>
+            </div>
+        </div>
+        <br>
+    </div>
+</body>
+</html>

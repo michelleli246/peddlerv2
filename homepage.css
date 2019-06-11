@@ -1,0 +1,80 @@
+/* PEDAL EXERCISER */
+
+div.all{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+div.logo{
+    display: block;
+    vertical-align:middle; 
+    text-align:center;
+}
+
+div.button{
+    display: block;
+    vertical-align:middle; 
+    text-align:center;
+}
+
+p.title {
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 75px;
+    line-height: 85px;
+    text-align: center;
+
+    color: #000000;
+}
+
+p.subtitle{
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 25px;
+    text-align: center;
+    line-height: 25px;
+
+    color: #000000;
+}
+
+button.playButton{
+    background-color: #f7f7f7;
+    border: 5px solid #39B7B8 ;
+    color: black;
+    padding: 20px 100px;
+    font-weight: bold;
+    font-size: 25px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.29);
+
+}
+
+button.playButton:hover{
+    background-color: #37bfb3;
+    border: 5px solid #39B7B8 ;
+    color: black;
+    padding: 20px 100px;
+    font-weight: bold;
+    font-size: 25px;
+    border-radius: 4px;
+    transition: .4s;
+
+}
+
+button.playButton:active{
+    background-color: #39B7B8;
+    border: 5px solid #39B7B8;
+    color: black;
+    padding: 20px 100px;
+    font-weight: bold;
+    font-size: 25px;
+    border-radius: 4px;
+    transform: translateY(2px);
+    box-shadow: inset 0 0 4px rgba(128, 128, 128, 0.1);
+
+}
