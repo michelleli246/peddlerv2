@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Peddler</title>
+
+    <link rel="stylesheet" type="text/css" href="/stylesheets/peddler.css">
+    <link href='/stylesheets/libs/open-sans.css' rel='stylesheet' type='text/css'>
+
+    <script src="/javascripts/createjs_1.2_min.js" type="text/javascript"></script>
+    <script src="/javascripts/10.5.0zim.js" type="text/javascript"></script>
+
+    <script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/peddler.js" type="text/javascript"></script>
+
+
+
+</head>
+
+<body>
+    <div id="select" class="all">
+        <img class="logo" src="/images/peddler/logolong.jpg" width="200" alt="Logo">
+        <br>
+        <div class="blueBg">
+            <br>
+            <div>
+                <p class="title">Where would you like to explore? <p>
+            </div>
+
+            <div class="buttons">
+                <button id="but0" class="pickButton" type="button"></button>
+                <button id="but1" class="pickButton" type="button"></button>
+                <button id="but2" class="pickButton" type="button"></button>
+            </div>
+            <br>
+            <div class="buttons">
+                <button id="but3" class="pickButton" type="button"></button>
+                <button id="but4" class="pickButton" type="button"></button>
+                <button id="but5" class="playButton" type="button" onclick="getTrackForNextPage()">Shuffle</button>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <div class="pop" id="video" onclick="window.location.reload();">
+        <!-- <div id="back"> <a href="/">Back to Videos</a></div> -->
+
+        <div class="vid1"><video loop id="bikeVideo" muted="muted"></video></div>
+        <div class="vid2"><video loop id="bikeVideo1" muted="muted"></video></div>
+        <p class="pauseInstructions">Press any button to return to menu</p>
+        <p class="startCountdown" id="ctDown"></p>
+    </div>
+</body>
+</html>
