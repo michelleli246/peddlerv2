@@ -23,16 +23,32 @@ var vid18 = { vname: "Hawaiian Resort", image: "images/peddler/hawaii.jpg", vid:
 var vid19 = { vname: "Cherry Blossoms", image: "images/peddler/cherryblossoms.jpg", vid: "videos/peddler/cherryblossoms.mp4", points: [[430, 99, 0, 0, 0, 0, 0, 0], [428.9, -43.7, 0, 0, 0, 10.3, 0, -10.3], [434.4, -136.1, 0, 0, 3.2, 24.1, -3.2, -24.1], [414.6, -193, 0, 0, 2.4, 10.6, -2.4, -10.6], [415.1, -333, 0, 0, 0, 0, 0, 0]] };
 var vid20 = { vname: "Big Ben", image: "images/peddler/bigben.jpg", vid: "videos/peddler/bigben.mp4", points: [[456.3,96.3,0,0,0,0,0,0],[430,83,0,0,0,0,0,0],[429.5,-57.6,0,0,0,0,0,0],[441.9,-68.8,0,0,-0.8,-18.6,0.8,18.6],[429.7,-81.1,0,0,0,0,0,0],[430,-333,0,0,0,0,0,0]] };
 var vid21 = { vname: "Bike Race", image: "images/peddler/bikerace.jpg", vid: "videos/peddler/bikerace.mp4", points: [[437.4, 99.3, 0, 0, 0, 0, 0, 0], [431.1, 77.8, 0, 0, 0.8, 8.5, -0.8, -8.5], [441.1, 61.4, 0, 0, 0, 10.1, 0, -10.1], [440.6, -57.2, 0, 0, 0, 0, 0, 0], [444.3, -64.4, 0, 0, 0, 0, 0, 0], [447, -92.6, 0, 0, -2.9, 9.5, 2.9, -9.5], [459.7, -112.6, 0, 0, 0, 0, 0, 0], [465.8, -127.4, 0, 0, 0.5, 10.6, -0.5, -10.6], [459.7, -138.6, 0, 0, 0, 0, -4.5, -12.7], [453.9, -188.3, 0, 0, -0.3, 18.6, 0.3, -18.6], [463.1, -203.4, 0, 0, -1.9, 7.7, 1.9, -7.7], [467.6, -211.3, 0, 0, -4.2, 0.3, 4.2, -0.3, "straight"], [467.6, -343.1, 0, 0, 0, 0, 0, 0]] };
+var vid21 = { vname: "Squidward Dabs", image: "images/peddler/squidwarddabs.jpg", vid: "videos/peddler/squidward_hits_a_dab.mp4", points: [[437.4, 99.3, 0, 0, 0, 0, 0, 0], [431.1, 77.8, 0, 0, 0.8, 8.5, -0.8, -8.5], [441.1, 61.4, 0, 0, 0, 10.1, 0, -10.1], [440.6, -57.2, 0, 0, 0, 0, 0, 0], [444.3, -64.4, 0, 0, 0, 0, 0, 0], [447, -92.6, 0, 0, -2.9, 9.5, 2.9, -9.5], [459.7, -112.6, 0, 0, 0, 0, 0, 0], [465.8, -127.4, 0, 0, 0.5, 10.6, -0.5, -10.6], [459.7, -138.6, 0, 0, 0, 0, -4.5, -12.7], [453.9, -188.3, 0, 0, -0.3, 18.6, 0.3, -18.6], [463.1, -203.4, 0, 0, -1.9, 7.7, 1.9, -7.7], [467.6, -211.3, 0, 0, -4.2, 0.3, 4.2, -0.3, "straight"], [467.6, -343.1, 0, 0, 0, 0, 0, 0]] };
+
 
 var arrTracks = [vid0, vid1, vid2, vid3, vid4, vid5, vid6, vid7, vid8, vid9, vid10, vid11, vid12, vid13, vid14, vid15, vid16, vid17, vid18, vid19, vid20, vid21];
 var vids = arrTracks.length;
 
+// Global variables to show current mode and active screen
+var gameMode = "singlePlayer"; // singlePlayer or competitive
+var currentScreen = "vidSelect";
+var rejectPedals = false;
+
 var videoPlaying;
-var vidSpeed = 0;
-var intervalNumPedals = 0;
+var declinedCompetitive = false;
+var noOfActivePeddlers = 0;
+var ids = [];
+var intervalNumPedals0 = 0;
+var intervalNumPedals1 = 0;
+var intervalNumPedals2 = 0;
+var reachedEnd = 0;
 let vidStartTime = 0;
+let bikeTime0 = 0;		
+let bikeTime1 = 0;		
+let bikeTime2 = 0;
+
 var onVid = false;
-const BACKEND_URL = 'http://99.79.49.40:8000';
+const BACKEND_URL = 'http://99.79.49.40:8000/';
 var eventObject = {
     timestamp:"currentTime", //current time
     typeOfInteraction:"interactionType", //buttonPress, timeStart, vidStart, sessionEnd, vidEnd, peddle, videoName
@@ -90,39 +106,139 @@ function getTrackForNextPage() {
     document.getElementById("but4").innerHTML = trackOfCurrentPage[4].vname;
 
     document.getElementById("but0").style.background = "url('" + trackOfCurrentPage[0].image + "')";
-    document.getElementById("but0").style.backgroundSize = "215px 215px";
+    document.getElementById("but0").style.backgroundSize = "30vh 30vh";
     document.getElementById("but1").style.background = "url('" + trackOfCurrentPage[1].image + "')";
-    document.getElementById("but1").style.backgroundSize = "215px 215px";
+    document.getElementById("but1").style.backgroundSize = "30vh 30vh";
     document.getElementById("but2").style.background = "url('" + trackOfCurrentPage[2].image + "')";
-    document.getElementById("but2").style.backgroundSize = "215px 215px";
+    document.getElementById("but2").style.backgroundSize = "30vh 30vh";
     document.getElementById("but3").style.background = "url('" + trackOfCurrentPage[3].image + "')";
-    document.getElementById("but3").style.backgroundSize = "215px 215px";
+    document.getElementById("but3").style.backgroundSize = "30vh 30vh";
     document.getElementById("but4").style.background = "url('" + trackOfCurrentPage[4].image + "')";
-    document.getElementById("but4").style.backgroundSize = "215px 215px";
+    document.getElementById("but4").style.backgroundSize = "30vh 30vh";
 
-    document.getElementById("but0").onclick = function () { pts = trackOfCurrentPage[0].points; togglePause(); randomizeAud(); document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo").src = trackOfCurrentPage[0].vid; recordVideoName(trackOfCurrentPage[0].vname); videoPlaying = trackOfCurrentPage[0].vname; recordRejectedVideos([trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('q'); };
-    document.getElementById("but1").onclick = function () { pts = trackOfCurrentPage[1].points; togglePause(); randomizeAud(); document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo").src = trackOfCurrentPage[1].vid; recordVideoName(trackOfCurrentPage[1].vname); videoPlaying = trackOfCurrentPage[1].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('w'); };
-    document.getElementById("but2").onclick = function () { pts = trackOfCurrentPage[2].points; togglePause(); randomizeAud(); document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo").src = trackOfCurrentPage[2].vid; recordVideoName(trackOfCurrentPage[2].vname); videoPlaying = trackOfCurrentPage[2].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('e'); };
-    document.getElementById("but3").onclick = function () { pts = trackOfCurrentPage[3].points; togglePause(); randomizeAud(); document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo").src = trackOfCurrentPage[3].vid; recordVideoName(trackOfCurrentPage[3].vname); videoPlaying = trackOfCurrentPage[3].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[4].vname]); startOrEndVid('a'); };
-    document.getElementById("but4").onclick = function () { pts = trackOfCurrentPage[4].points; togglePause(); randomizeAud(); document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo").src = trackOfCurrentPage[4].vid; recordVideoName(trackOfCurrentPage[4].vname); videoPlaying = trackOfCurrentPage[4].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname]); startOrEndVid('s'); };
+    document.getElementById("but0").onclick = function () { pts = trackOfCurrentPage[0].points; setScreen(gameMode); recordGameMode(gameMode); document.getElementById("bikeVideo0").src = document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo2").src = trackOfCurrentPage[0].vid; recordVideoName(trackOfCurrentPage[0].vname); videoPlaying = trackOfCurrentPage[0].vname; recordRejectedVideos([trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('q'); };
+    document.getElementById("but1").onclick = function () { pts = trackOfCurrentPage[1].points; setScreen(gameMode); recordGameMode(gameMode); document.getElementById("bikeVideo0").src = document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo2").src = trackOfCurrentPage[1].vid; recordVideoName(trackOfCurrentPage[1].vname); videoPlaying = trackOfCurrentPage[1].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('w'); };
+    document.getElementById("but2").onclick = function () { pts = trackOfCurrentPage[2].points; setScreen(gameMode); recordGameMode(gameMode); document.getElementById("bikeVideo0").src = document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo2").src = trackOfCurrentPage[2].vid; recordVideoName(trackOfCurrentPage[2].vname); videoPlaying = trackOfCurrentPage[2].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]); startOrEndVid('e'); };
+    document.getElementById("but3").onclick = function () { pts = trackOfCurrentPage[3].points; setScreen(gameMode); recordGameMode(gameMode); document.getElementById("bikeVideo0").src = document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo2").src = trackOfCurrentPage[3].vid; recordVideoName(trackOfCurrentPage[3].vname); videoPlaying = trackOfCurrentPage[3].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[4].vname]); startOrEndVid('a'); };
+    document.getElementById("but4").onclick = function () { pts = trackOfCurrentPage[4].points; setScreen(gameMode); recordGameMode(gameMode); document.getElementById("bikeVideo0").src = document.getElementById("bikeVideo1").src = document.getElementById("bikeVideo2").src = trackOfCurrentPage[4].vid; recordVideoName(trackOfCurrentPage[4].vname); videoPlaying = trackOfCurrentPage[4].vname; recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname]); startOrEndVid('s'); };
     document.getElementById("but5").onclick = function () { getTrackForNextPage(); startOrEndVid('d'); recordRejectedVideos([trackOfCurrentPage[0].vname, trackOfCurrentPage[1].vname, trackOfCurrentPage[2].vname, trackOfCurrentPage[3].vname, trackOfCurrentPage[4].vname]);};
+
+    document.getElementById("but9").onclick = function() {gameMode = "singlePlayer"; setScreen(gameMode); recordGameMode(gameMode); declinedCompetitive = true; setTimeout(function(){declinedCompetitive = false;}, 60000)};
+    document.getElementById("but11").onclick = function() {gameMode = "competitive"; setScreen(gameMode); recordGameMode(gameMode)};
+    
 
 }
 
-//Display and hide video and video selection screens in succession
-function togglePause() {
-    var select = document.getElementById("select");
-    var video = document.getElementById("video");
+function setScreen(screenName) {
+    let vidSelect = document.getElementById("vidSelect");
+    let singlePlayerVid = document.getElementById("singlePlayerVid");
+    let competitiveVid = document.getElementById("competitiveVid");
+    let modeSelect = document.getElementById("modeSelect");
+    let winWindow = document.getElementById('winWindow');
+    let bikeVideo0 = document.getElementById('bikeVideo0');
+    let singlePlayerWin = document.getElementById("singlePlayerWin");
+    let finish1 = document.getElementById("finish1");
+    let finish2 = document.getElementById("finish2");
 
-    if (select.style.display == "block") {
-        select.style.display = "block";
-        video.style.display = "none";
-    } else {
-        select.style.display = "none";
-        video.style.display = "block";
+    if (screenName == "modeSelect") {
+        currentScreen = "modeSelect";
+        vidSelect.style.display = "none";
+        modeSelect.style.display = "block";
+        singlePlayerVid.style.display = "none";
+        competitiveVid.style.display = "none";
+        hideMap();
+        pauseAud();
+    } else if (screenName == "vidSelect") {
+        currentScreen = "vidSelect";
+        vidSelect.style.display = "block";
+        modeSelect.style.display = "none";
+        singlePlayerVid.style.display = "none";
+        competitiveVid.style.display = "none";
+        hideMap();
+    } else if (screenName == "singlePlayer") {
+        currentScreen = "singlePlayer";
+        gameMode = "singlePlayer";
+        vidSelect.style.display = "none";
+        modeSelect.style.display = "none";
+        singlePlayerVid.style.display = "block";
+        competitiveVid.style.display = "none";
+        randomizeAud();
+        map();
+        speedchanger();
+        currTime = setInterval(function(){updateCurrentTime();}, 100);
+
+        bikeVideo0.onended = function(){
+            updateCurrentTime();
+            clearTimeout(currTime);
+            singlePlayerWin.style.display = "block";
+            recordTime('vidEnd0');
+            reachedEnd = 1;
+
+            setTimeout(function(){ window.location.reload(); reachedEnd = 0; }, 10000);
+
+            var countWin = 11;
+            function countdownWin() {
+                
+                if (countWin > 0) {
+                    document.getElementById("ctDown2").innerHTML=countWin -1;
+                    countWin=countWin - 1;
+                    setTimeout(function(){countdownWin()}, 1000);
+                }
+            }
+            countdownWin();  
+        };
+
+    } else if (screenName == "competitive"){
+        currentScreen = "competitive";
+        gameMode = "competitive";
+        vidSelect.style.display = "none";
+        modeSelect.style.display = "none";
+        singlePlayerVid.style.display = "none";
+        competitiveVid.style.display = "block";
+        randomizeAud();
         map();
         startingCountDown();
-        
+        setInterval(function(){updateCurrentTime();}, 100);
+
+        bikeVideo1.onended = function(){
+            finish1.style.display = "block";
+            //compPlayer1Win.style.display = "block";
+            if(bikeVideo2.onended){
+
+}
+            recordTime('vidEnd0');
+            reachedEnd = 1;
+            setTimeout(function(){ window.location.reload(); reachedEnd = 0; }, 10000);
+
+            var countWin = 11;
+            function countdownWin() {
+                
+                if (countWin > 0) {
+                    document.getElementById("ctDown2").innerHTML=countWin -1;
+                    countWin=countWin - 1;
+                    setTimeout(function(){countdownWin()}, 1000);
+                }
+            }
+            countdownWin();  
+        };
+        bikeVideo2.onended = function(){
+            finish2.style.display = "block";
+            //compPlayer2Win.style.display = "block";
+            recordTime('vidEnd0');
+            reachedEnd = 1;
+            setTimeout(function(){ window.location.reload(); reachedEnd = 0; }, 10000);
+
+            var countWin = 11;
+            function countdownWin() {
+                
+                if (countWin > 0) {
+                    document.getElementById("ctDown2").innerHTML=countWin -1;
+                    countWin=countWin - 1;
+                    setTimeout(function(){countdownWin()}, 1000);
+                }
+            }
+            countdownWin();  
+        };
     }
 }
 
@@ -138,10 +254,10 @@ var song7 = { link: "/sounds/peddler/RocketMan.mp3" };
 var song8 = { link: "/sounds/peddler/UnchainedMelody.mp3" };
 var song9 = { link: "/sounds/peddler/UnderTheBoardwalk.mp3" };
 
+//Randomize the song which plays
 var songTracks = [song0, song1, song2, song3, song4, song5, song6, song7, song8, song9];
 var sound = new Audio();
 
-//Randomize the song which plays 
 function randomizeAud() {
     var n = songTracks.length;
     var tempArr = [];
@@ -163,20 +279,30 @@ function randomizeAud() {
     };
 }
 
+function pauseAud(){
+    sound.pause();
+}
 
-var cur; //current progress of video1
-var cur1; //current progress of video2
-var dur; //duration of video
+
 
 var scaling = "fit"; // this will resize to fit inside the screen dimensions
-//var width = 1140;
-//var height = 700;
+//var width = 140;
+//var height = 100;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc.
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. are fine to use
 
 const frame = new Frame();
 
 function map() { // ES6 Arrow Funchttps://codepen.io/zimjstion - similar to function(){}
+    var cur0; //current progress of video0
+    var cur1; //current progress of video1
+    var cur2; //current progress of video2
+    var dur; //duration of video
+
+    let vid0 = document.getElementById('bikeVideo0');
+    let vid1 = document.getElementById('bikeVideo1');
+    let vid2 = document.getElementById('bikeVideo2');
+
     // often need below - so consider it part of the template
     let stage = frame.stage;
 
@@ -198,7 +324,7 @@ function map() { // ES6 Arrow Funchttps://codepen.io/zimjstion - similar to func
 
     var path2 = new Squiggle({
         color: '#686868',
-        thickeness: 9,
+        thickness: 9,
         points: pts,
         onTop: false,
         showControls: false
@@ -214,21 +340,32 @@ function map() { // ES6 Arrow Funchttps://codepen.io/zimjstion - similar to func
     }).pos({ x: 280, y: 200, right: true, bottom: true });
 
     // Dynamic Animation
-    var rect1 = new Triangle(20, 30, 30, '#FF00FF')
-        .centerReg()
-        .sca(1, -1)
-        .rot(-90)
-        .animate({
-            props: {
-                // orient:false,
-                path: path
-            },
-            time: 2000,
-            ease: "linear",
-            startPaused: true
+    if (gameMode == "singlePlayer"){
+        dur = vid0.duration;
+
+        var cursor0 = new Triangle(20, 30, 30, '#FF00FF')
+            .centerReg()
+            .sca(1, -1)
+            .rot(-90)
+            .animate({
+                props: {
+                    // orient:false,
+                    path: path
+                },
+                time: 2000,
+                ease: "linear",
+                startPaused: true
+            });
+        
+        // if using damping with slider then use a Ticker not a change event
+        Ticker.add(function () {
+            cursor0.percentComplete = (cur0 / dur) * 100;
         });
 
-    var rect2 = new Triangle(20, 30, 30, '#0033EE')
+    } else if (gameMode == "competitive"){
+        dur = vid1.duration;
+        console.log("in map competitive");
+        var cursor1 = new Triangle(20, 30, 30, '#FF00FF')
             .centerReg()
             .sca(1, -1)
             .rot(-90)
@@ -242,110 +379,214 @@ function map() { // ES6 Arrow Funchttps://codepen.io/zimjstion - similar to func
                 startPaused: true
             });
 
-    // if using damping with slider then use a Ticker not a change event
-    Ticker.add(function () {
-        rect1.percentComplete = (cur / dur) * 100;
-        rect2.percentComplete = (cur1/dur)*100;
-    });
+        var cursor2 = new Triangle(20, 30, 30, '#0033EE')
+            .centerReg()
+            .sca(1, -1)
+            .rot(-90)
+            .animate({
+                props: {
+                    // orient:false,
+                    path: path
+                },
+                time: 2000,
+                ease: "linear",
+                startPaused: true
+            });
+        
+        // if using damping with slider then use a Ticker not a change event
+        Ticker.add(function () {
+            cursor1.percentComplete = (cur1 / dur) * 100;
+            cursor2.percentComplete = (cur2 / dur) * 100;
+        });
+    }
 
     stage.update(); // this is needed to show any changes
-    
-    var vid = document.getElementById('bikeVideo');
-    cur = vid.currentTime;
+    console.log("in map");
 
-    vid.onloadedmetadata = function () {
-        dur = vid.duration;
-        console.log(cur);
+    cur0 = vid0.currentTime;
+    cur1 = vid1.currentTime;
+    cur2 = vid2.currentTime;
 
+    vid0.onloadedmetadata = function () {
+        dur = vid0.duration;
+    };
+    vid1.onloadedmetadata = function () {
+        dur = vid1.duration;
     };
 
     setInterval(function () {
-        cur = vid.currentTime;
-        $(".progress-bar").each(function () {
-            $(this).width((cur / dur) * 100 + '%');
-        });
+        cur0 = vid0.currentTime;
+        cur1 = vid1.currentTime;
+        cur2 = vid2.currentTime;
     }, 10);
-
 };
 
-var countDown=7;
+function hideMap(){
+    let stage = frame.stage;
+    stage.removeAllChildren();
+    stage.update();
+}
 
-//TODO
+// Countdown before video
 function startingCountDown(){
-
-    if(countDown >2){
-        document.getElementById("ctDown").innerHTML=countDown-2;
-    } else if(countDown > 1){
-        document.getElementById("ctDown").innerHTML="Go!";
-    }else{
-        document.getElementById("ctDown").innerHTML="";
-        clearTimeout();
-        speedchanger();
-
+    var countDown = 6;
+    rejectPedals = true;
+    function countDownHelper() {
+        if (countDown > 1){
+            document.getElementById("ctDown").innerHTML = countDown - 1;
+            countDown=countDown - 1;
+            setTimeout(function(){countDownHelper()}, 1000);
+        } else if (countDown == 1){
+            document.getElementById("ctDown").innerHTML="Go!";
+            countDown=countDown - 1;
+            setTimeout(function(){countDownHelper()}, 1000);
+        } else {
+            // countDown == 0
+            document.getElementById("ctDown").innerHTML="";
+            rejectPedals = false;
+            speedchanger();
+        }
     }
-        
-    countDown--;
-    setTimeout(startingCountDown, 1000);
-
-};
+    countDownHelper();
+}
 
 $(document).ready(function () {
     randomize();
     getTrackForNextPage();
-    //speedchanger();
+
+    var socket = io();  
+    socket.connect('http://192.168.0.100:3000');
+
+    socket.emit('peddler start', {chatroom: 'peddler'});
+    socket.on('peddler turned', function(msg){
+        console.log("msg" + msg);
+        console.log("msgid" + msg.id);
+        console.log("ids" + ids);
+        console.log("# active peddlers" + noOfActivePeddlers);
+        console.log("type of msgid" + typeof msg.id);
+        if (!ids.includes(msg.id)) {
+            console.log("in if statement");
+            ids.push(msg.id);
+            noOfActivePeddlers += 1;
+            if (noOfActivePeddlers === 2) {
+                if (gameMode == "singlePlayer" && declinedCompetitive == false) {
+                    // Ask if they want to switch to competitive
+                    setScreen("modeSelect");
+                }    
+            }
+            console.log("ids" + ids);
+            console.log("# active peddlers" + noOfActivePeddlers);
+        }
+        // checks if msg is first video, is doing something to first video	
+        if (msg.id === ids[0]){
+            console.log('chos');
+            if (gameMode == "singlePlayer"){
+                ifPeddle("player0");
+            } else if (gameMode == "competitive") {
+                ifPeddle("player1");
+            }
+            console.log('beche', msg.count);
+        }
+        
+
+        else if (msg.id === ids[1]){
+            if (gameMode == "competitive"){
+                ifPeddle("player2");
+            }
+            console.log('beche2', msg.count);
+        }   
+    });
+    socket.on('redirect', function(destination) {
+        window.location.href = destination;
+    });
 
 });
 
-$(document).keypress(function (event) {
+function millisToMins(millis) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
 
+function updateCurrentTime(){		
+    if (vidStartTime != 0){		
+        bikeTime0 = Date.now() - vidStartTime;	
+        document.getElementById("bikeTime0").innerHTML = millisToMins(bikeTime0);	
+        document.getElementById("bikeTime0Win").innerHTML = millisToMins(bikeTime0);	
+        bikeTime1 = Date.now() - vidStartTime;		
+        //document.getElementById("bikeTime1").innerHTML = millisToMins(bikeTime1);	
+        bikeTime2 = Date.now() - vidStartTime;
+        //document.getElementById("bikeTime2").innerHTML = millisToMins(bikeTime2);			
+    }		
+}
+
+$(document).keypress(function (event) {
     console.log(String.fromCharCode(event.which));
 
     if ('q'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('q');
-        if (document.getElementById("but0") != null && document.getElementById("but0").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but0").click();
-        }
-        else if (document.getElementById("video") != null) {
+        } else if (currentScreen == "modeSelect"){
+            // do nothing
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
             postData();
         }
     } else if ('w'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('w');
-        if (document.getElementById("but1") != null && document.getElementById("but1").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but1").click();
-        }
-        else if (document.getElementById("video") != null) {
+        } else if (currentScreen == "modeSelect"){
+            // do nothing
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
             postData();
         }
     } else if ('e'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('e');
-        if (document.getElementById("but2") != null && document.getElementById("but2").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but2").click();
-        }
-        else if (document.getElementById("video") != null) {
+        } else if (currentScreen == "modeSelect"){
+            // do nothing
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
             postData();
         }
     } else if ('a'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('a');
-        if (document.getElementById("but3") != null && document.getElementById("but3").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but3").click();
-        }
-        else if (document.getElementById("video") != null) {
+        } else if (currentScreen == "modeSelect"){
+            document.getElementById("but9").click();
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
             postData();
         }
     } else if ('s'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('s');
-        if (document.getElementById("but4") != null && document.getElementById("but4").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but4").click();
-        }
-        else if (document.getElementById("video") != null) { 
-            postData();  
+        } else if (currentScreen == "modeSelect"){
+            // do nothing
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
+            postData();
         }
     } else if ('d'.indexOf(String.fromCharCode(event.which)) !== -1) {
         recordButtonPress('d');
-        if (document.getElementById("but5") != null && document.getElementById("but5").parentNode.parentNode.parentNode.style.display != "none") {
+        if (currentScreen == "vidSelect"){
             document.getElementById("but5").click();
-        }
-        else if (document.getElementById("video") != null) {
+        } else if (currentScreen == "modeSelect"){
+            document.getElementById("but11").click();
+        } else if (currentScreen == "singlePlayer"){
+            postData();
+        } else if (currentScreen == "competitive"){
             postData();
         }
     }
@@ -362,7 +603,7 @@ $(document).keypress(function (event) {
             window.location.href = navPath;
         }
         setTimeout(navigate, 1000);
-        
+    
     }
 });
 
@@ -383,176 +624,314 @@ function startOrEndVid (key){
             // do nothing
         }
         onVid = true;
+        vidStartTime = Date.now();
 
         // Send pedal count every 5s
-        intervalNumPedals = 0;
-        setInterval(function(){recordPedalInterval(intervalNumPedals); intervalNumPedals = 0}, 5000);
-        vidStartTime = Date.now();
+        if (gameMode == "singlePlayer"){
+            intervalNumPedals0 = 0;
+            setInterval(function(){recordPedalInterval("player0", intervalNumPedals0); intervalNumPedals0 = 0}, 5000);
+        } else if (gameMode == "competitive"){
+            intervalNumPedals1 = 0;
+            intervalNumPedals2 = 0;
+            setInterval(function(){recordPedalInterval("player1", intervalNumPedals1); intervalNumPedals1 = 0}, 5000);
+            setInterval(function(){recordPedalInterval("player2", intervalNumPedals2); intervalNumPedals2 = 0}, 5000);
+        }
+
     } else {
         // On video
         if (key == 'q'){
-            recordTime('vidEnd');
+            recordTime('quitVid');
         } else if (key == 'w') {
-            recordTime('vidEnd');
+            recordTime('quitVid');
         } else if (key == 'e') {
-            recordTime('vidEnd');
+            recordTime('quitVid');
         } else if (key == 'a') {
-            recordTime('vidEnd');
+            recordTime('quitVid');
         } else if (key == 's') {
-            recordTime('vidEnd');
+            recordTime('quitVid');
         } else if (key == 'd') {
-            recordTime('vidEnd');
+            recordTime('quitVid');
         }
     }
 }
+
+
+/* Speed changing variables and functions */
+// Speed changer variables
+let peddlerVideo0 = document.getElementById('bikeVideo0');
+let peddlerVideo1 = document.getElementById('bikeVideo1');
+let peddlerVideo2 = document.getElementById('bikeVideo2');
+
+let pedalCount0 = 0;
+let pedalCount1 = 0;
+let pedalCount2 = 0;
+
+let speedIndex0 = 0;
+let speedIndex1 = 0;
+let speedIndex2 = 0;
+
+let vidSpeed0 = 0;
+let vidSpeed1 = 0;
+let vidSpeed2 = 0;
+
+let updateInterval = 3000;
+let currentPedalTime0 = 0;
+let currentPedalTime1 = 0;
+let currentPedalTime2 = 0;
+let lastPedalTime0;
+let lastPedalTime1;
+let lastPedalTime2;
+
+let speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];//var speed = [0, 1, 1.3, 1.55, 1.75, 1.9, 2];
+
+function ifPeddle(player){
+    if (rejectPedals == true){
+        return;
+    }
+    setSpeed();
+    if (player == "player0"){
+        // Single player
+        recordPeddle(player);
+        recordSpeed(player, vidSpeed0);
+        pedalCount0++;
+        intervalNumPedals0++;
+        setTimeout(function(){updateRecentPedal(player)}, updateInterval);
+        
+        // Increase vidSpeed here
+        lastPedalTime0 = currentPedalTime0;
+        currentPedalTime0 = Date.now(); // in milliseconds
+        
+        let pedalTimeInterval = currentPedalTime0 - lastPedalTime0;
+        
+        if (pedalTimeInterval >= 0 && pedalTimeInterval < 75){
+            speedIndex0 = 6;
+        } else if (pedalTimeInterval >= 75 && pedalTimeInterval < 250){
+            speedIndex0 = 5;
+        } else if (pedalTimeInterval >= 250 && pedalTimeInterval < 500){
+            speedIndex0 = 4;
+        } else if (pedalTimeInterval >= 500 && pedalTimeInterval < 1000){
+            speedIndex0 = 3;
+        } else if (pedalTimeInterval >= 1000 && pedalTimeInterval < 1500){
+            speedIndex0 = 2;
+        } else {
+            speedIndex0 = 1;
+        }
+        
+        vidSpeed0 = speed[speedIndex0];
+        peddlerVideo0.playbackRate = vidSpeed0;
+        recordSpeed(player, vidSpeed0);
+        if(reachedEnd == 0){
+            peddlerVideo0.play();
+        }
+            
+    } else if (player == "player1") {
+        // Competitive player 1
+        recordPeddle(player);
+        recordSpeed(player, vidSpeed1);
+        pedalCount1++;
+        intervalNumPedals1++;
+        setTimeout(function(){updateRecentPedal(player)}, updateInterval);
+        
+        // Increase vidSpeed here
+        lastPedalTime1 = currentPedalTime1;
+        currentPedalTime1 = Date.now(); // in milliseconds
+        
+        let pedalTimeInterval = currentPedalTime1 - lastPedalTime1;
+        
+        if (pedalTimeInterval >= 0 && pedalTimeInterval < 75){
+            speedIndex1 = 6;
+        } else if (pedalTimeInterval >= 75 && pedalTimeInterval < 250){
+            speedIndex1 = 5;
+        } else if (pedalTimeInterval >= 250 && pedalTimeInterval < 500){
+            speedIndex1 = 4;
+        } else if (pedalTimeInterval >= 500 && pedalTimeInterval < 1000){
+            speedIndex1 = 3;
+        } else if (pedalTimeInterval >= 1000 && pedalTimeInterval < 1500){
+            speedIndex1 = 2;
+        } else {
+            speedIndex1 = 1;
+        }
+        
+        vidSpeed1 = speed[speedIndex1];
+        console.log("vidspeed1 " + vidSpeed1);
+        peddlerVideo1.playbackRate = vidSpeed1;
+        recordSpeed(player, vidSpeed1);
+        peddlerVideo1.play();
+    } else if (player == "player2") {
+        // Competitive player 2
+        recordPeddle(player);
+        recordSpeed(player, vidSpeed2);
+        pedalCount2++;
+        intervalNumPedals2++;
+        setTimeout(function(){updateRecentPedal(player)}, updateInterval);
+        
+        // Increase vidSpeed here
+        lastPedalTime2 = currentPedalTime2;
+        currentPedalTime2 = Date.now(); // in milliseconds
+        
+        let pedalTimeInterval = currentPedalTime2 - lastPedalTime2;
+        
+        if (pedalTimeInterval >= 0 && pedalTimeInterval < 75){
+            speedIndex2 = 6;
+        } else if (pedalTimeInterval >= 75 && pedalTimeInterval < 250){
+            speedIndex2 = 5;
+        } else if (pedalTimeInterval >= 250 && pedalTimeInterval < 500){
+            speedIndex2 = 4;
+        } else if (pedalTimeInterval >= 500 && pedalTimeInterval < 1000){
+            speedIndex2 = 3;
+        } else if (pedalTimeInterval >= 1000 && pedalTimeInterval < 1500){
+            speedIndex2 = 2;
+        } else {
+            speedIndex2 = 1;
+        }
+        
+        vidSpeed2 = speed[speedIndex2];
+        console.log("vidspeed2 " + vidSpeed2);
+        peddlerVideo2.playbackRate = vidSpeed2;
+        recordSpeed(player, vidSpeed2);
+        peddlerVideo2.play();
+    }
+}
+function setSpeed(){    
+    if (videoPlaying == "Gondola in Venice"){
+        speed = [0, 1, 2, 3, 5, 10, 50];//[0, 1, 1.3, 1.5, 2, 2.5, 3];
+    } else if (videoPlaying == "French Alps"){
+        speed = [0, 1, 1.4, 1.75, 2.15, 2.5, 3];
+    } else if (videoPlaying == "Central Park"){
+        speed = [0, 1, 1.3, 1.8, 2.2, 2.65, 3];
+    } else if (videoPlaying == "Rocky Desert"){
+        speed = [0, 0.8, 1, 1.3, 1.7, 2, 2.5];
+    } else if (videoPlaying == "Country Road"){
+        speed = [0, 1, 1.5, 2, 2.5, 3, 3.5];
+    } else if (videoPlaying == "Forest Trail"){
+        speed = [0, 1, 1.5, 1.8, 2.5, 3, 3.5];
+    } else if (videoPlaying == "Lakeshore County"){
+        speed = [0, 0.8, 1.2, 1.6, 2.1, 2.6, 3.2];
+    } else if (videoPlaying == "Alpine Village"){
+        speed = [0, 0.8, 1.1, 1.35, 1.65, 2.25, 3.0];
+    } else if (videoPlaying == "Evergreen Trail"){
+        speed = [0, 1.5, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Bustling City"){
+        speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];
+    } else if (videoPlaying == "Evening City"){
+        speed = [0, 1, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Winter Dogsled"){
+        speed = [0, 1, 1.4, 1.75, 2.05, 2.3, 2.5];
+    } else if (videoPlaying == "Eiffel Tower"){
+        speed = [0, 1, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Outside the Louvre"){
+        speed = [0, 1, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Beach Walk"){
+        speed = [0, 1, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Egyptian Pyramids"){
+        speed = [0, 1, 1.5, 2, 2.5, 3, 4];
+    } else if (videoPlaying == "Majestic Mountains"){
+        speed = [0, 0.8, 1.1, 1.5, 2, 2.6, 3];
+    } else if (videoPlaying == "Italian Riviera"){
+        speed = [0, 1, 2, 2.5, 3, 3.5, 4];
+    } else if (videoPlaying == "Hawaiian Resort"){
+        speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];
+    } else if (videoPlaying == "Cherry Blossoms"){
+        speed = [0, 1, 1.5, 2, 2.6, 3.5, 4];
+    } else if (videoPlaying == "Big Ben"){
+        speed = [0, 1, 1.3, 1.6, 1.9, 2.5, 3.5];
+    }  else if (videoPlaying == "Bike Race"){
+        speed = [0, 0.7, 0.9, 1.2, 1.5, 1.8];
+    }
+}
+
+function updateRecentPedal(player) {
+    if (player == "player0"){
+        if (pedalCount0 > 0) {
+            pedalCount0 = pedalCount0 - 1;
+        }
+
+        if (pedalCount0 == 0){
+            speedIndex0 = 0;
+            vidSpeed0 = speed[speedIndex0];
+            peddlerVideo0.playbackRate = vidSpeed0;
+            recordSpeed(player, vidSpeed0);
+        }
+    } else if (player == "player1"){
+        if (pedalCount1 > 0) {
+            pedalCount1 = pedalCount1 - 1;
+        }
+
+        if (pedalCount1 == 0){
+            speedIndex1 = 0;
+            vidSpeed1 = speed[speedIndex1];
+            peddlerVideo1.playbackRate = vidSpeed1;
+            recordSpeed(player, vidSpeed1);
+        }
+    } else if (player == "player2"){
+        if (pedalCount2 > 0) {
+            pedalCount2 = pedalCount2 - 1;
+        }
+
+        if (pedalCount2 == 0){
+            speedIndex2 = 0;
+            vidSpeed2 = speed[speedIndex2];
+            peddlerVideo2.playbackRate = vidSpeed2;
+            recordSpeed(player, vidSpeed2);
+        }
+    }
+}
+
 
 function speedchanger(){
-    let peddlerVideo1 = document.getElementById('bikeVideo');
-    var speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];//var speed = [0, 1, 1.3, 1.55, 1.75, 1.9, 2];
-    var speedIndex = 0;
-    var decreaseInterval = 1000;
-    var updateInterval = 3000;
-    var currentPedalTime = 0;
-    var lastPedalTime;
-    var pedalCount = 0;
-
-    // Set speeds according to video
-    function setSpeed(){    
-        if (videoPlaying == "Gondola in Venice"){
-            speed = [0, 1, 2, 3, 5, 10, 50];//[0, 1, 1.3, 1.5, 2, 2.5, 3];
-        } else if (videoPlaying == "French Alps"){
-            speed = [0, 1, 1.4, 1.75, 2.15, 2.5, 3];
-        } else if (videoPlaying == "Central Park"){
-            speed = [0, 1, 1.3, 1.8, 2.2, 2.65, 3];
-        } else if (videoPlaying == "Rocky Desert"){
-            speed = [0, 0.8, 1, 1.3, 1.7, 2, 2.5];
-        } else if (videoPlaying == "Country Road"){
-            speed = [0, 1, 1.5, 2, 2.5, 3, 3.5];
-        } else if (videoPlaying == "Forest Trail"){
-            speed = [0, 1, 1.5, 1.8, 2.5, 3, 3.5];
-        } else if (videoPlaying == "Lakeshore County"){
-            speed = [0, 0.8, 1.2, 1.6, 2.1, 2.6, 3.2];
-        } else if (videoPlaying == "Alpine Village"){
-            speed = [0, 0.8, 1.1, 1.35, 1.65, 2.25, 3.0];
-        } else if (videoPlaying == "Evergreen Trail"){
-            speed = [0, 1.5, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Bustling City"){
-            speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];
-        } else if (videoPlaying == "Evening City"){
-            speed = [0, 1, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Winter Dogsled"){
-            speed = [0, 1, 1.4, 1.75, 2.05, 2.3, 2.5];
-        } else if (videoPlaying == "Eiffel Tower"){
-            speed = [0, 1, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Outside the Louvre"){
-            speed = [0, 1, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Beach Walk"){
-            speed = [0, 1, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Egyptian Pyramids"){
-            speed = [0, 1, 1.5, 2, 2.5, 3, 4];
-        } else if (videoPlaying == "Majestic Mountains"){
-            speed = [0, 0.8, 1.1, 1.5, 2, 2.6, 3];
-        } else if (videoPlaying == "Italian Riviera"){
-            speed = [0, 1, 2, 2.5, 3, 3.5, 4];
-        } else if (videoPlaying == "Hawaiian Resort"){
-            speed = [0, 1, 1.3, 1.6, 1.95, 2.3, 2.5];
-        } else if (videoPlaying == "Cherry Blossoms"){
-            speed = [0, 1, 1.5, 2, 2.6, 3.5, 4];
-        } else if (videoPlaying == "Big Ben"){
-            speed = [0, 1, 1.3, 1.6, 1.9, 2.5, 3.5];
-        }  else if (videoPlaying == "Bike Race"){
-            speed = [0, 0.7, 0.9, 1.2, 1.5, 1.8];
-        }
-    }
-    // Decrease the speed
-    var myDecr = setTimeout(decreaseSpeed, decreaseInterval);
+    console.log("in sp changer");
+    peddlerVideo0 = document.getElementById('bikeVideo0');
+    peddlerVideo1 = document.getElementById('bikeVideo1');
+    peddlerVideo2 = document.getElementById('bikeVideo2');
     
-    function decreaseSpeed(){
-        speedIndex--;
-        if (speedIndex <= 0){
-            speedIndex = 0;
-        }
-        peddlerVideo1.playbackRate = vidSpeed;
-        recordSpeed(vidSpeed);
-    }
-        
-    function updateRecentPedal() {
-        if (pedalCount > 0) {
-            pedalCount = pedalCount - 1;
-        }
+    // Sets speeds according to video
 
-        if (pedalCount == 0){
-            speedIndex = 0;
-            vidSpeed = speed[speedIndex];
-            peddlerVideo1.playbackRate = vidSpeed;
-            recordSpeed(vidSpeed);
+    $(document).keypress(function (event) {		
+        console.log(String.fromCharCode(event.which));		
+        try{
+            if ('p'.indexOf(String.fromCharCode(event.which)) !== -1) {		
+                if (gameMode == "singlePlayer"){
+                    ifPeddle("player0");	
+                } else {
+                    ifPeddle("player1");
+                }
+            }  else if ('o'.indexOf(String.fromCharCode(event.which)) !== -1) {
+                if (gameMode == "singlePlayer" && declinedCompetitive == false) {
+                    // Ask if they want to switch to competitive
+                    setScreen("modeSelect");
+                } else if (gameMode == 'competitive'){
+                    ifPeddle("player2");
+                }
+            }
+        }catch(err){
+            console.log(err)
         }
-    }
-    
-    $(document).keypress(function (event) {
-        console.log(String.fromCharCode(event.which));
-        if ('p'.indexOf(String.fromCharCode(event.which)) !== -1) {
-            ifPeddle();
-        }
-
+      
     });
 
-    function ifPeddle(){
-        recordPeddle();
-        recordSpeed(vidSpeed);
-        pedalCount++;
-        intervalNumPedals++;
-        setTimeout(updateRecentPedal, updateInterval);
-        setSpeed();
-        console.log(videoPlaying);
-    
-        // Increase vidSpeed here
-        lastPedalTime = currentPedalTime;
-        currentPedalTime = Date.now(); // in milliseconds
-    
-        var pedalTimeInterval = currentPedalTime - lastPedalTime;
-    
-        if (pedalTimeInterval >= 0 && pedalTimeInterval < 75){
-            speedIndex = 6;
-        } else if (pedalTimeInterval >= 75 && pedalTimeInterval < 250){
-            speedIndex = 5;
-        } else if (pedalTimeInterval >= 250 && pedalTimeInterval < 500){
-            speedIndex = 4;
-        } else if (pedalTimeInterval >= 500 && pedalTimeInterval < 1000){
-            speedIndex = 3;
-        } else if (pedalTimeInterval >= 1000 && pedalTimeInterval < 1500){
-            speedIndex = 2;
-        } else {
-            speedIndex = 1;
-        }
-    
-        vidSpeed = speed[speedIndex];
-    
-        peddlerVideo1.playbackRate = vidSpeed;
-        recordSpeed(vidSpeed);
-        peddlerVideo1.play();
-    }
-    var socket = io();
-    socket.connect('http://192.168.0.100:3000');
-    socket.emit('peddler start', { chatroom: 'peddler' });
-    socket.on('peddler turned', function (msg) {
-        console.log('beche', msg.count);
-        ifPeddle();
-       
-    });
-    socket.on('redirect', function (destination) {
-        window.location.href = destination;
-    });
+
+
 }
 
-function getElapsedTime(currentTime){
+/* Functions for data recording */
+function getElapsedTime(currentTime, player){
     if (vidStartTime == 0){
         return 0;
     } else {
-        var vid = document.getElementById('bikeVideo');
-        return vid.currentTime;
+        if (player == "player0"){
+            let vid = document.getElementById('bikeVideo0');
+            return vid.currentTime;
+        } else if (player == "player1"){
+            let vid = document.getElementById('bikeVideo1');
+            return vid.currentTime; 
+        } else {
+            // Player 2
+            let vid = document.getElementById('bikeVideo2');
+            return vid.currentTime;
+        }
     }
 }
+
 
 function recordButtonPress(pressedKey){
     // Create events
@@ -560,18 +939,42 @@ function recordButtonPress(pressedKey){
     buttonPressEvent.timestamp = Date.now();
     buttonPressEvent.typeOfInteraction = "buttonPress";
     buttonPressEvent.interaction = pressedKey;
-    buttonPressEvent.elapsedTime = getElapsedTime(Date.now());
+    let player;
+    if (gameMode == "singlePlayer"){
+        player = "player0"
+    } else {
+        player = "player1"
+    }
+    buttonPressEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList 
     eventList.push(buttonPressEvent);
 }
 
-function recordPeddle(){
+function recordGameMode(gameMode){
+    // Create events
+    const gameModeEvent = Object.create(eventObject);
+    gameModeEvent.timestamp = Date.now();
+    gameModeEvent.typeOfInteraction = "gameMode";
+    gameModeEvent.interaction = gameMode;
+    let player;
+    if (gameMode == "singlePlayer"){
+        player = "player0"
+    } else {
+        player = "player1"
+    }
+    gameModeEvent.elapsedTime = getElapsedTime(Date.now(), player);
+
+    // Log to eventList 
+    eventList.push(gameModeEvent);
+}
+
+function recordPeddle(player){
     const peddleEvent = Object.create(eventObject);
     peddleEvent.timestamp = Date.now();
-    peddleEvent.typeOfInteraction = "peddle";
+    peddleEvent.typeOfInteraction = player;
     peddleEvent.interaction = 'p';
-    peddleEvent.elapsedTime = getElapsedTime(Date.now());
+    peddleEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList array
     eventList.push(peddleEvent);
@@ -582,7 +985,13 @@ function recordTime(timeType){
     timeEvent.timestamp = Date.now();
     timeEvent.typeOfInteraction = timeType;
     timeEvent.interaction = Date.now();
-    timeEvent.elapsedTime = getElapsedTime(Date.now());
+    let player;
+    if (gameMode == "singlePlayer"){
+        player = "player0"
+    } else {
+        player = "player1"
+    }
+    timeEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList array
     eventList.push(timeEvent);
@@ -593,7 +1002,13 @@ function recordVideoName(vidName){
     videoEvent.timestamp = Date.now();
     videoEvent.typeOfInteraction = "videoName";
     videoEvent.interaction = vidName;
-    videoEvent.elapsedTime = getElapsedTime(Date.now());
+    let player;
+    if (gameMode == "singlePlayer"){
+        player = "player0"
+    } else {
+        player = "player1"
+    }
+    videoEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList array
     eventList.push(videoEvent);
@@ -606,7 +1021,13 @@ function recordRejectedVideos(rejectedVidNamesArray){
             rejectedVidEvent.timestamp = Date.now();
             rejectedVidEvent.typeOfInteraction = "rejectedVideoName";
             rejectedVidEvent.interaction = rejectedVidNamesArray[i];
-            rejectedVidEvent.elapsedTime = getElapsedTime(Date.now());
+            let player;
+            if (gameMode == "singlePlayer"){
+                player = "player0"
+            } else {
+                player = "player1"
+            }
+            rejectedVidEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
             // Log to eventList array
             eventList.push(rejectedVidEvent);
@@ -614,23 +1035,23 @@ function recordRejectedVideos(rejectedVidNamesArray){
     }
 }
 
-function recordSpeed(speed){
+function recordSpeed(player, speed){
     const speedEvent = Object.create(eventObject);
     speedEvent.timestamp = Date.now();
-    speedEvent.typeOfInteraction = 'speed';
+    speedEvent.typeOfInteraction = 'speed of ' + player;
     speedEvent.interaction = speed;
-    speedEvent.elapsedTime = getElapsedTime(Date.now());
+    speedEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList array
     eventList.push(speedEvent);
 }
 
-function recordPedalInterval(intervalNumPedals){
+function recordPedalInterval(player, intervalNumPedals){
     const pedalIntervalEvent = Object.create(eventObject);
     pedalIntervalEvent.timestamp = Date.now();
-    pedalIntervalEvent.typeOfInteraction = 'pedalsIn5Seconds';
+    pedalIntervalEvent.typeOfInteraction = player + ' pedalsIn5Seconds';
     pedalIntervalEvent.interaction = intervalNumPedals;
-    pedalIntervalEvent.elapsedTime = getElapsedTime(Date.now());
+    pedalIntervalEvent.elapsedTime = getElapsedTime(Date.now(), player);
 
     // Log to eventList array
     eventList.push(pedalIntervalEvent);
@@ -646,7 +1067,7 @@ function postData(url , data ) {
     makeRequest(session)
     .then(response => {response.json()
         console.log(response);
-        document.getElementById("video").click();
+        document.getElementById("singlePlayerVid").click();
 
     }).catch((err)=>{
         console.log(err);
@@ -662,7 +1083,7 @@ function postData(url , data ) {
             newArrays.push(session);
             localStorage.setItem('videoJSON',JSON.stringify(newArrays));
         }
-        document.getElementById("video").click();
+        document.getElementById("singlePlayerVid").click();
     }); // parses JSON response into native Javascript objects
 }
 
@@ -682,6 +1103,7 @@ async function makeRequest (session){
     })
     return res
 }
+
 window.onload=((e)=>{
     let arrays=localStorage.getItem('videoJSON');
     if(arrays){
@@ -689,7 +1111,7 @@ window.onload=((e)=>{
         arrays.forEach((element,index)=>{
             makeRequest(element).then(res=>{
                 console.log(res)
-                if(res.status===200){
+                if(res.status===201){
                     console.log('success')
                     thearrays=JSON.parse(localStorage.getItem('videoJSON'));
                     thearrays.forEach((theelement,i) => {
